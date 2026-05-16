@@ -1,0 +1,10 @@
+{
+  "sudo": [],
+  "delay": 3,
+  "dp": 0.05,
+  "mode": "batch",
+  "max": 2,
+  "ab_time": 180,
+  "ab_text": "",
+  "ab_status": false
+}
