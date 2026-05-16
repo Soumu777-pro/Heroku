@@ -1,0 +1,37 @@
+{
+  "name": "Telethon Multi Userbot",
+  "description": "Advanced Telethon Multi Userbot Controller",
+  "repository": "https://github.com/Soumu777-pro/Userbot5",
+  "logo": "https://telegra.ph/file/1d14a8d4c4d8e4f8a4c71.jpg",
+  "keywords": [
+    "telegram",
+    "telethon",
+    "userbot",
+    "python"
+  ],
+  "stack": "container",
+  "env": {
+    "API_ID": {
+      "description": "Telegram API ID",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Telegram API HASH",
+      "required": true
+    },
+    "BOT_TOKEN": {
+      "description": "Bot Token From BotFather",
+      "required": true
+    },
+    "OWNER_ID": {
+      "description": "Telegram User ID",
+      "required": true
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  }
+}
