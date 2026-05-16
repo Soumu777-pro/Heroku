@@ -23,7 +23,7 @@ bot = TelegramClient(
     "manager_bot",
     API_ID,
     API_HASH
-).start(bot_token=BOT_TOKEN)
+)
 
 # ================= GLOBALS =================
 
@@ -32,24 +32,32 @@ ab_tasks = {}
 
 SESSIONS_FILE = "sessions.json"
 
-# ================= SESSION STORAGE =================
+# ================= SESSION FILE =================
 
 if not os.path.exists(SESSIONS_FILE):
+
     with open(SESSIONS_FILE, "w") as f:
         json.dump({"sessions": []}, f, indent=4)
 
 
+# ================= LOAD SESSIONS =================
+
 def load_sessions():
+
     with open(SESSIONS_FILE) as f:
         data = json.load(f)
 
     return data.get("sessions", [])
 
 
+# ================= SAVE SESSION =================
+
 def save_session(session):
+
     data = load_sessions()
 
     if session not in data:
+
         data.append(session)
 
         with open(SESSIONS_FILE, "w") as f:
@@ -59,19 +67,22 @@ def save_session(session):
 # ================= AUTH =================
 
 def is_auth(uid):
+
     return uid == OWNER_ID or uid in config.get("sudo", [])
 
 
 # ================= FAST REPLY =================
 
 async def fast_reply(event, text):
+
     try:
         return await event.reply(text)
+
     except:
         return None
 
 
-# ================= REGISTER COMMANDS =================
+# ================= REGISTER HANDLERS =================
 
 def register_handlers(client):
 
@@ -79,6 +90,7 @@ def register_handlers(client):
 
     @client.on(events.NewMessage(pattern=r"\.ping"))
     async def ping(event):
+
         if not is_auth(event.sender_id):
             return
 
@@ -95,6 +107,7 @@ def register_handlers(client):
 
     @client.on(events.NewMessage(pattern=r"\.stats"))
     async def stats(event):
+
         if not is_auth(event.sender_id):
             return
 
@@ -111,6 +124,7 @@ def register_handlers(client):
 
     @client.on(events.NewMessage(pattern=r"\.sudolist"))
     async def sudolist(event):
+
         if not is_auth(event.sender_id):
             return
 
@@ -132,6 +146,7 @@ def register_handlers(client):
         config.setdefault("sudo", [])
 
         if uid not in config["sudo"]:
+
             config["sudo"].append(uid)
 
             save_config(config)
@@ -149,6 +164,7 @@ def register_handlers(client):
         uid = int(event.pattern_match.group(1))
 
         if uid in config.get("sudo", []):
+
             config["sudo"].remove(uid)
 
             save_config(config)
@@ -296,7 +312,7 @@ def register_handlers(client):
 
         os._exit(0)
 
-    # ================= BROADCAST =================
+    # ================= BROADCAST FUNCTION =================
 
     async def broadcast_func(text):
 
@@ -360,6 +376,8 @@ def register_handlers(client):
 
         return sent, fail
 
+    # ================= BROADCAST =================
+
     @client.on(events.NewMessage(pattern=r"\.b"))
     async def broadcast(event):
 
@@ -369,9 +387,11 @@ def register_handlers(client):
         status = await fast_reply(event, "Starting Broadcast...")
 
         if event.is_reply:
+
             text = (await event.get_reply_message()).text or ""
 
         else:
+
             text = event.text.replace(".b", "").strip()
 
         if not text:
@@ -383,9 +403,9 @@ def register_handlers(client):
             f"✅ Done\nSent: {sent}\nFailed: {fail}"
         )
 
-    # ================= AUTO BROADCAST =================
+    # ================= AUTO BROADCAST LOOP =================
 
-    async def ab_loop(client, text):
+    async def ab_loop(text):
 
         while True:
 
@@ -395,9 +415,13 @@ def register_handlers(client):
 
                 await asyncio.sleep(get("ab_time", 180))
 
-            except:
+            except Exception as e:
+
+                print(e)
 
                 break
+
+    # ================= AUTO BROADCAST =================
 
     @client.on(events.NewMessage(pattern=r"\.ab"))
     async def auto_broadcast(event):
@@ -406,9 +430,11 @@ def register_handlers(client):
             return
 
         if event.is_reply:
+
             text = (await event.get_reply_message()).text or ""
 
         else:
+
             text = event.text.replace(".ab", "").strip()
 
         if not text:
@@ -418,7 +444,7 @@ def register_handlers(client):
 
             ab_tasks[client].cancel()
 
-        task = asyncio.create_task(ab_loop(client, text))
+        task = asyncio.create_task(ab_loop(text))
 
         ab_tasks[client] = task
 
@@ -426,6 +452,8 @@ def register_handlers(client):
             event,
             f"✅ Auto Broadcast Started\n⏱ Every {get('ab_time',180)} sec"
         )
+
+    # ================= STOP AUTO BROADCAST =================
 
     @client.on(events.NewMessage(pattern=r"\.stopab"))
     async def stopab(event):
@@ -486,7 +514,9 @@ def register_handlers(client):
 .reset
 """
 
-        await event.reply(text + "\n\n🔰 MULTI USERBOT ACTIVE")
+        await event.reply(
+            text + "\n\n🔰 MULTI USERBOT ACTIVE"
+        )
 
 
 # ================= START USERBOT =================
@@ -551,6 +581,8 @@ async def setvar(event):
 
 async def main():
 
+    await bot.start(bot_token=BOT_TOKEN)
+
     sessions = load_sessions()
 
     for s in sessions:
@@ -562,4 +594,6 @@ async def main():
     await bot.run_until_disconnected()
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+
+    asyncio.run(main())
